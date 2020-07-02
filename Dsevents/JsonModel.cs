@@ -13,7 +13,13 @@ namespace Dsevents
 
         public WorkingModel GetWorkingModel()
         {
-            var workingModel = new WorkingModel();
+            WorkingModel workingModel = new WorkingModel();
+
+            foreach (Channel channel in Channels)
+            {
+                workingModel.Channels.Add(channel.ID, channel);
+            }
+
             foreach (Process process in Processes)
             {
                 workingModel.Processes.Add(process.ID, new List<Event>());
@@ -33,16 +39,9 @@ namespace Dsevents
 
                 if (!added)
                 {
-                    break;
+                    return workingModel;
                 }
             }
-
-            foreach (Channel channel in Channels)
-            {
-                workingModel.Channels.Add(channel.ID, channel);
-            }
-
-            return workingModel;
         }
     }
 }
