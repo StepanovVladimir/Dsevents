@@ -14,18 +14,18 @@ namespace Dsevents
 
             if (args[0] == "past")
             {
-                Dictionary<string, ISet<string>> past = model.GetPast(GetEventIDs(args));
-                WriteEventIDsDictionary("past", past);
+                ISet<string> past = model.GetPast(args[1]);
+                WriteEventIDs(past);
             }
             else if (args[0] == "future")
             {
-                Dictionary<string, ISet<string>> future = model.GetFuture(GetEventIDs(args));
-                WriteEventIDsDictionary("future", future);
+                ISet<string> future = model.GetFuture(args[1]);
+                WriteEventIDs(future);
             }
             else if (args[0] == "concurrent")
             {
-                Dictionary<string, ISet<string>> concurrent = model.GetConcurrent(GetEventIDs(args));
-                WriteEventIDsDictionary("concurrent", concurrent);
+                ISet<string> concurrent = model.GetConcurrent(args[1]);
+                WriteEventIDs(concurrent);
             }
         }
 
@@ -46,24 +46,13 @@ namespace Dsevents
             }
         }
 
-        private static List<string> GetEventIDs(string[] args)
+        private static void WriteEventIDs(ISet<string> eventIDs)
         {
-            List<string> eventIDs = new List<string>(args);
-            eventIDs.RemoveAt(0);
-            return eventIDs;
-        }
-
-        private static void WriteEventIDsDictionary(string title, Dictionary<string, ISet<string>> eventIDsDictionary)
-        {
-            Console.WriteLine(title + ":");
-            foreach (var eventIDs in eventIDsDictionary)
+            foreach (string eventID in eventIDs)
             {
-                Console.WriteLine("  " + eventIDs.Key + ":");
-                foreach (string eventID in eventIDs.Value)
-                {
-                    Console.WriteLine("    " + eventID);
-                }
+                Console.Write(eventID + " ");
             }
+            Console.WriteLine();
         }
     }
 }

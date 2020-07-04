@@ -6,70 +6,52 @@ namespace Dsevents
 {
     class WorkingModel
     {
-        public Dictionary<string, List<Event>> Processes { get; set; } = new Dictionary<string, List<Event>>();
         public Dictionary<string, Channel> Channels { get; set; } = new Dictionary<string, Channel>();
+        public Dictionary<string, List<Event>> Processes { get; set; } = new Dictionary<string, List<Event>>();
 
-        public Dictionary<string, ISet<string>> GetPast(List<string> eventIDs)
+        public ISet<string> GetPast(string eventID)
         {
-            var pastEventIDs = new Dictionary<string, ISet<string>>();
-            for (int i = 0; i < eventIDs.Count; i++)
-            {
-                Event analyzableEvent = GetEvent(eventIDs[i]);
+            Event analyzableEvent = GetEvent(eventID);
 
-                ISet<string> past = new SortedSet<string>();
-                FindPast(analyzableEvent, past);
+            ISet<string> past = new SortedSet<string>();
+            FindPast(analyzableEvent, past);
 
-                pastEventIDs.Add(analyzableEvent.ID, past);
-            }
-
-            return pastEventIDs;
+            return past;
         }
 
-        public Dictionary<string, ISet<string>> GetFuture(List<string> eventIDs)
+        public ISet<string> GetFuture(string eventID)
         {
-            var futureEventIDs = new Dictionary<string, ISet<string>>();
-            for (int i = 0; i < eventIDs.Count; i++)
-            {
-                Event analyzableEvent = GetEvent(eventIDs[i]);
+            Event analyzableEvent = GetEvent(eventID);
 
-                ISet<string> future = new SortedSet<string>();
-                FindFuture(analyzableEvent, future);
+            ISet<string> future = new SortedSet<string>();
+            FindFuture(analyzableEvent, future);
 
-                futureEventIDs.Add(analyzableEvent.ID, future);
-            }
-
-            return futureEventIDs;
+            return future;
         }
 
-        public Dictionary<string, ISet<string>> GetConcurrent(List<string> eventIDs)
+        public ISet<string> GetConcurrent(string eventID)
         {
-            var concurrentEventIDs = new Dictionary<string, ISet<string>>();
-            for (int i = 0; i < eventIDs.Count; i++)
+            Event analyzableEvent = GetEvent(eventID);
+
+            ISet<string> past = new SortedSet<string>();
+            FindPast(analyzableEvent, past);
+
+            ISet<string> future = new SortedSet<string>();
+            FindFuture(analyzableEvent, future);
+
+            ISet<string> concurrent = new SortedSet<string>();
+            foreach (var process in Processes)
             {
-                Event analyzableEvent = GetEvent(eventIDs[i]);
-
-                ISet<string> past = new SortedSet<string>();
-                FindPast(analyzableEvent, past);
-
-                ISet<string> future = new SortedSet<string>();
-                FindFuture(analyzableEvent, future);
-
-                ISet<string> concurrent = new SortedSet<string>();
-                foreach (var process in Processes)
+                foreach (Event e in process.Value)
                 {
-                    foreach (Event e in process.Value)
+                    if (e.ID != analyzableEvent.ID && !past.Contains(e.ID) && !future.Contains(e.ID))
                     {
-                        if (e.ID != analyzableEvent.ID && !past.Contains(e.ID) && !future.Contains(e.ID))
-                        {
-                            concurrent.Add(e.ID);
-                        }
+                        concurrent.Add(e.ID);
                     }
                 }
-
-                concurrentEventIDs.Add(analyzableEvent.ID, concurrent);
             }
 
-            return concurrentEventIDs;
+            return concurrent;
         }
 
         private Event GetEvent(string eventID)

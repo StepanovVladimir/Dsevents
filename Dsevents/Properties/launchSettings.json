@@ -2,7 +2,7 @@
   "profiles": {
     "Dsevents": {
       "commandName": "Project",
-      "commandLineArgs": "concurrent < model.json > output.txt e3_1 e2_2 e1_3"
+      "commandLineArgs": "concurrent e2_3 < model.json > output.txt"
     }
   }
 }
